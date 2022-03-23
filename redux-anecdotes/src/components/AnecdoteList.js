@@ -1,33 +1,30 @@
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
 import { vote } from '../reducers/anecdoteReducer'
+import { newNotification, reset } from '../reducers/notificationReducer'
+import { useSelector, useDispatch } from 'react-redux'
 
-const Anecdote = ({ anecdote, handleClick }) => {
-  return(
-    <div onClick={handleClick}>
-      {anecdote.content}
-      <br></br>has {anecdote.votes} votes
-      <button onClick={() => vote(anecdote.id)}>vote</button>
-    </div>
-  )
-}
+const AnecdoteList = () => {
 
-const Anecdotes = () => {
   const dispatch = useDispatch()
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(state => state.anecdotes)
 
-  return(
-    <div>
-      {anecdotes.map(anecdote =>
-        <Anecdote 
-            key={anecdote.id}
-            anecdote={anecdote}
-            handleClick={() => 
-            dispatch(vote(anecdote.id))
-            }
-        />
-      )}
-    </div>
-  )
+    const voteClick = (anecdote) => {
+        dispatch(vote(anecdote.id))
+        dispatch(newNotification(`you voted '${anecdote.content}'`))
+        setTimeout(() => {
+          dispatch(reset())
+        }, 5000)
+    }
+    return (
+        <div>
+            {anecdotes.map(anecdote => 
+              <div key={anecdote.id}><div>{anecdote.content}</div>
+              <div> has {anecdote.votes} votes
+              <button onClick={() => voteClick(anecdote)}>vote</button>
+              </div></div>
+            )}
+        </div>
+    )
 }
 
-export default Anecdotes
+export default AnecdoteList
